@@ -1,13 +1,9 @@
 'use client'
 
-import { postArchiveFileClient } from '@/entities/archive/file'
-import { useGetArchiveFoldersQuery } from '@/entities/archive/folder'
 import { News } from '@/entities/news'
-import { useCopyToSpaceAction } from '@/features/shared-archive/import-file/model/useCopyToSpaceAction'
+import { useNewsSave } from '@/features/news'
 
 import { BaseNewsCard, MainNewsCard, SubNewsCard } from '@/shared/ui/card'
-import { showErrorToast, showSuccessToast } from '@/shared/ui/toast/Toast'
-import { useState } from 'react'
 
 interface Props {
   news: News[]
@@ -25,44 +21,9 @@ export const NewsGrid = ({
   subNews,
   spaceId
 }: Props) => {
-  const { foldersQuery } = useGetArchiveFoldersQuery()
-  const folderList = foldersQuery.data?.data
-  const [loadingMap, setLoadingMap] = useState<Record<string, boolean>>({})
-  const [selectedFolder] = useState<number | null>(
-    folderList?.find(f => f.folderName === 'default')?.folderId ?? null
-  )
-
-  const { handleCopyToSpace } = useCopyToSpaceAction()
-
-  if (!folderList) return null
-  const handlePost = async (newUrl: string) => {
-    try {
-      setLoadingMap(prev => ({ ...prev, [newUrl]: true }))
-      const fileId = await postArchiveFileClient(selectedFolder, newUrl)
-
-      if (spaceId && fileId.data?.dataSourceId) {
-        await handleCopyToSpace(parseInt(spaceId), [
-          {
-            files: [
-              {
-                fileId: fileId.data?.dataSourceId,
-                fileName: 'default'
-              }
-            ],
-            folderId: selectedFolder ?? 0,
-            folderName: 'default'
-          }
-        ])
-      }
-      showSuccessToast('파일 업로드 성공')
-    } catch {
-      showErrorToast('파일 업로드 중 오류 발생')
-    } finally {
-      setLoadingMap(prev => ({ ...prev, [newUrl]: false }))
-    }
-  }
-
+  const { handlePost, loadingMap } = useNewsSave(spaceId ?? '')
   const limitedNews = news.slice((page - 1) * 18, page * 18)
+
   return (
     <div>
       {type === 'main' && mainNews && subNews ? (
