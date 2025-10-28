@@ -7,6 +7,7 @@ import {
   QueryClient
 } from '@tanstack/react-query'
 import { Metadata } from 'next'
+import Link from 'next/link'
 
 export const metadata: Metadata = {
   title: '추천 뉴스',
@@ -16,10 +17,10 @@ export const metadata: Metadata = {
 export default async function Recommend({
   searchParams
 }: {
-  searchParams: Promise<{ page: string; folderId?: string }>
+  searchParams: Promise<{ folderId?: string }>
 }) {
   const folders = await getInitialFolderList()
-  const { page, folderId } = await searchParams
+  const { folderId } = await searchParams
 
   const queryClient = new QueryClient()
 
@@ -62,8 +63,6 @@ export default async function Recommend({
     queryFn: () => getInitialNews({ folderId: selectedFolderId })
   })
 
-  // const currentPage = Number(page) || 1
-
   return (
     <div className="w-full flex flex-col p-10 min-h-[calc(100vh-72px)] bg-white">
       <div className="flex-1 flex flex-col">
@@ -81,7 +80,7 @@ export default async function Recommend({
           </h2>
           <div className="flex gap-2">
             {list.map(folder => (
-              <a
+              <Link
                 key={folder.folderId}
                 href={`/news/recommend?folderId=${folder.folderId}`}
                 className={`px-4 py-2 rounded-md ${
@@ -92,7 +91,7 @@ export default async function Recommend({
                 {folder.folderName === 'default'
                   ? '기본 폴더'
                   : folder.folderName}
-              </a>
+              </Link>
             ))}
           </div>
         </div>
