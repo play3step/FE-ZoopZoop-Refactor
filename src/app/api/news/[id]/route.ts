@@ -2,14 +2,11 @@ import { fetchRecommendedNewServer } from '@/entities/news'
 import { requireAuth } from '@/shared/lib/api-route'
 import { NextResponse } from 'next/server'
 
-export const GET = async (
-  _: Request,
-  { params }: { params: Promise<{ folderId: string }> }
-) => {
+export const GET = async ({ params }: { params: Promise<{ id: string }> }) => {
   try {
-    const { folderId } = await params
+    const { id } = await params
     const response = await requireAuth(async token => {
-      return await fetchRecommendedNewServer(folderId, { token })
+      return await fetchRecommendedNewServer(id, { token })
     })
     return NextResponse.json(response)
   } catch (error) {
