@@ -2,7 +2,10 @@ import { fetchRecommendedNewServer } from '@/entities/news'
 import { requireAuth } from '@/shared/lib/api-route'
 import { NextResponse } from 'next/server'
 
-export const GET = async ({ params }: { params: Promise<{ id: string }> }) => {
+export const GET = async (
+  _: Request,
+  { params }: { params: Promise<{ id: string }> }
+) => {
   try {
     const { id } = await params
     const response = await requireAuth(async token => {
