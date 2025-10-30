@@ -18,7 +18,9 @@ export const fetchNewsByKeywords = async (
     { next: { revalidate: 300, tags: [`news-${keywords}`] }, ...options }
   )
 }
-export const fetchRecommendedNews = async (
+
+// 개인 기준 뉴스 추천
+export const fetchRecommendedNewServer = async (
   payload: string,
   options?: NextFetchOptions
 ): Promise<RecommendedNewsResponse> => {

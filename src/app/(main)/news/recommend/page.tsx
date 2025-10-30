@@ -1,9 +1,13 @@
 import { getInitialFolderList } from '@/entities/archive/folder/api/folder.ssr'
-import { fetchRecommendedNews } from '@/entities/news'
-import { requireAuth } from '@/shared/lib/api-route'
-import Pagination from '@/shared/ui/pagination/Pagination'
-import { NewsGrid } from '@/widgets/news'
+import { getInitialNews } from '@/entities/news'
+import { RecommendedNewsList } from '@/widgets/news/news-recommend/ui/NewsRecommend'
+import {
+  dehydrate,
+  HydrationBoundary,
+  QueryClient
+} from '@tanstack/react-query'
 import { Metadata } from 'next'
+import Link from 'next/link'
 
 export const metadata: Metadata = {
   title: '추천 뉴스',
@@ -13,10 +17,12 @@ export const metadata: Metadata = {
 export default async function Recommend({
   searchParams
 }: {
-  searchParams: Promise<{ page: string; folderId?: string }>
+  searchParams: Promise<{ folderId?: string }>
 }) {
   const folders = await getInitialFolderList()
-  const { page, folderId } = await searchParams
+  const { folderId } = await searchParams
+
+  const queryClient = new QueryClient()
 
   if (!folders || folders.length === 0) {
     return (
@@ -37,16 +43,25 @@ export default async function Recommend({
     )
   }
 
-  const selectedFolderId = folderId || folders[0]?.folderId.toString()
+  let defaultFolder
+  const remainFolders = []
 
-  const news = await requireAuth(token =>
-    fetchRecommendedNews(selectedFolderId, {
-      token,
-      next: { revalidate: 300 }
-    })
-  )
+  for (const folder of folders) {
+    if (folder.folderName === 'default') {
+      defaultFolder = folder
+    } else {
+      remainFolders.push(folder)
+    }
+  }
 
-  const currentPage = Number(page) || 1
+  const list = defaultFolder ? [defaultFolder, ...remainFolders] : remainFolders
+
+  const selectedFolderId = folderId || defaultFolder?.folderId?.toString() || ''
+
+  await queryClient.prefetchQuery({
+    queryKey: ['recommended-news', selectedFolderId],
+    queryFn: () => getInitialNews({ folderId: selectedFolderId })
+  })
 
   return (
     <div className="w-full flex flex-col p-10 min-h-[calc(100vh-72px)] bg-white">
@@ -64,8 +79,8 @@ export default async function Recommend({
             분석된 관심 폴더
           </h2>
           <div className="flex gap-2">
-            {folders.map(folder => (
-              <a
+            {list.map(folder => (
+              <Link
                 key={folder.folderId}
                 href={`/news/recommend?folderId=${folder.folderId}`}
                 className={`px-4 py-2 rounded-md ${
@@ -76,30 +91,16 @@ export default async function Recommend({
                 {folder.folderName === 'default'
                   ? '기본 폴더'
                   : folder.folderName}
-              </a>
+              </Link>
             ))}
           </div>
         </div>
 
         <div className="pt-6">
-          {news?.data?.items && news?.data?.items?.length > 0 ? (
-            <NewsGrid
-              news={news.data.items}
-              page={currentPage}
-              type="sub"
-            />
-          ) : (
-            <div className="text-center py-20 text-gray-500">
-              추천할 뉴스가 없습니다.
-            </div>
-          )}
+          <HydrationBoundary state={dehydrate(queryClient)}>
+            <RecommendedNewsList selectedFolderId={selectedFolderId} />
+          </HydrationBoundary>
         </div>
-      </div>
-
-      <div className="mt-8">
-        <Pagination
-          totalPages={news?.data?.total ? Math.ceil(news.data.total / 18) : 1}
-        />
       </div>
     </div>
   )
