@@ -1,9 +1,11 @@
 'use client'
 
 import { SPACE_STATUS, TabType } from '@/entities/space'
+import { cn } from '@/shared/lib'
 import { Tabs, TabsList, TabsTrigger } from '@/shared/ui/shadcn/tabs'
 import { Check, CircleDashed } from 'lucide-react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import { useTransition } from 'react'
 
 const tabs: TabType[] = [
   {
@@ -27,15 +29,18 @@ const SpaceTab = () => {
   const pathname = usePathname()
   const searchParams = useSearchParams()
   const currentState = searchParams.get('state') ?? 'ALL'
+  const [isPending, startTransition] = useTransition()
 
   const handleTabChange = (value: string) => {
-    const params = new URLSearchParams(searchParams.toString())
-    if (value === SPACE_STATUS.ALL) {
-      params.delete('state')
-    } else {
-      params.set('state', value)
-    }
-    return router.push(`${pathname}?${params.toString()}`)
+    startTransition(() => {
+      const params = new URLSearchParams(searchParams.toString())
+      if (value === SPACE_STATUS.ALL) {
+        params.delete('state')
+      } else {
+        params.set('state', value)
+      }
+      router.push(`${pathname}?${params.toString()}`)
+    })
   }
 
   return (
@@ -43,7 +48,7 @@ const SpaceTab = () => {
       className="py-2 pt-3"
       defaultValue={currentState}
       onValueChange={handleTabChange}>
-      <TabsList className="h-10 p-1">
+      <TabsList className={cn('h-10 p-1', isPending && 'pointer-events-none')}>
         {tabs.map(tab => (
           <TabsTrigger
             key={tab.label}
