@@ -1,8 +1,8 @@
-import { memberQueryKeys } from '@/entities/space'
 import {
   getSpaceMemberList,
   getSpacePendingMemberList
 } from '@/entities/space/member/api/member.ssr'
+import { QUERY_KEYS } from '@/shared/config'
 import { Separator } from '@/shared/ui/shadcn/separator'
 import {
   MemberTableSkeleton,
@@ -28,11 +28,11 @@ const SpaceManagementPage = async ({ params }: Props) => {
 
   await Promise.all([
     queryClient.prefetchQuery({
-      queryKey: memberQueryKeys.list(numericId),
+      queryKey: QUERY_KEYS.SPACE_MEMBER.list(numericId),
       queryFn: () => getSpaceMemberList(numericId)
     }),
     queryClient.prefetchQuery({
-      queryKey: memberQueryKeys.pending(numericId),
+      queryKey: QUERY_KEYS.SPACE_MEMBER.pending(numericId),
       queryFn: () => getSpacePendingMemberList(numericId)
     })
   ])

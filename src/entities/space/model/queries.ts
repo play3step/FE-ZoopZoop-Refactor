@@ -12,7 +12,7 @@ import {
   updateSpaceNameClient
 } from '../api/space.client'
 import { SpacePagination, SpaceStatus } from './type'
-import { SpaceQueryKey } from './constants'
+import { QUERY_KEYS, MUTATION_KEYS } from '@/shared/config'
 
 interface SpaceQuery {
   pagination: {
@@ -28,7 +28,10 @@ export const useSpaceQuery = ({ pagination }: SpaceQuery) => {
     SpacePagination | null,
     Error
   >({
-    queryKey: [SpaceQueryKey, pagination.currentPage, pagination.currentState],
+    queryKey: QUERY_KEYS.SPACE.pagination(
+      pagination.currentPage,
+      pagination.currentState
+    ),
     queryFn: () =>
       fetchSpaceListClient({
         page: pagination.currentPage,
@@ -58,7 +61,7 @@ export const useCreateSpaceMutation = (
   >
 ) => {
   const { mutate, isPending } = useMutation({
-    mutationKey: ['create-space'],
+    mutationKey: MUTATION_KEYS.SPACE.create(),
     mutationFn: (payload: string) => postSpaceClient(payload),
     ...options
   })
@@ -77,7 +80,7 @@ export const useDeleteSpaceMutation = (
   >
 ) => {
   const { mutate, isPending } = useMutation({
-    mutationKey: ['delete-space'],
+    mutationKey: MUTATION_KEYS.SPACE.delete(),
     mutationFn: (spaceId: number) => deleteSpaceClient(spaceId),
     ...options
   })
@@ -107,7 +110,7 @@ export const useEditSpaceNameMutation = (
   >
 ) => {
   const { mutate, isPending } = useMutation({
-    mutationKey: ['edit-space'],
+    mutationKey: MUTATION_KEYS.SPACE.edit(),
     mutationFn: ({ name, spaceId }: { spaceId: number; name: string }) =>
       updateSpaceNameClient(spaceId, name),
     ...options
@@ -127,7 +130,7 @@ export const useLeaveSpaceMutation = (
   >
 ) => {
   const { mutate, isPending } = useMutation({
-    mutationKey: ['leave-member'],
+    mutationKey: MUTATION_KEYS.SPACE.leave(),
     mutationFn: payload => leaveSpaceClient(payload),
     ...options
   })

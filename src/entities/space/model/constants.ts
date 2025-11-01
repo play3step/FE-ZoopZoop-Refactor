@@ -3,5 +3,3 @@ export enum SPACE_STATUS {
   JOINED = 'JOINED',
   PENDING = 'PENDING'
 }
-
-export const SpaceQueryKey = 'spaces'

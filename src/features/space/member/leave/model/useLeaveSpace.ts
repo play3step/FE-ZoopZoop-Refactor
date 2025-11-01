@@ -6,6 +6,7 @@ import { showErrorToast, showSuccessToast } from '@/shared/ui/toast/Toast'
 import { useQueryClient } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
+import { QUERY_KEYS } from '@/shared/config'
 
 export const useLeaveSpace = () => {
   const closeModal = useModalStore(state => state.closeModal)
@@ -26,7 +27,7 @@ export const useLeaveSpace = () => {
       showErrorToast(error.message)
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ['spaces'] })
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.SPACE.all() })
     }
   })
 

@@ -14,13 +14,14 @@ import {
   fetchArchiveFilesByPageClient,
   postArchiveFileClient
 } from '../api/file.client'
+import { QUERY_KEYS, MUTATION_KEYS } from '@/shared/config'
 
 export const useArchiveFilesByFolderQuery = (
   folderId: number,
   options?: { enabled?: boolean }
 ) => {
   const filesQuery = useQuery({
-    queryKey: ['archiveFilesPage', folderId],
+    queryKey: QUERY_KEYS.ARCHIVE_FILE.byFolder(folderId),
     queryFn: () => fetchArchiveFilesByFolderClient(folderId),
     enabled: options?.enabled
   })
@@ -41,7 +42,13 @@ export const useArchiveFilesByPageQuery = ({
   const { folderId, page, sort, size, keyword, isActive } = query
 
   return useQuery({
-    queryKey: ['archiveFilesPage', folderId, page, sort, keyword, isActive], //쿼리 키를 다르게 설정
+    queryKey: QUERY_KEYS.ARCHIVE_FILE.byPage(
+      folderId ?? 0,
+      page ?? 1,
+      sort ?? '',
+      keyword,
+      isActive
+    ),
     queryFn: () =>
       fetchArchiveFilesByPageClient({
         folderId,
@@ -58,6 +65,7 @@ export const useArchiveFilesByPageQuery = ({
 export const useDeleteOneArchiveFileQuery = () => {
   const queryClient = useQueryClient()
   const deleteOneFile = useMutation({
+    mutationKey: MUTATION_KEYS.ARCHIVE_FILE.deleteOne(),
     mutationFn: (dataSourceId: number) =>
       deleteOneArchiveFileClient(dataSourceId),
     onSuccess: () => {
@@ -70,6 +78,7 @@ export const useDeleteOneArchiveFileQuery = () => {
 export const useDeleteManyArchiveFileQuery = () => {
   const queryClient = useQueryClient()
   const deleteManyFile = useMutation({
+    mutationKey: MUTATION_KEYS.ARCHIVE_FILE.deleteMany(),
     mutationFn: (dataSourceId: number[]) =>
       deleteManyArchiveFileClient(dataSourceId),
     onSuccess: () => {
@@ -83,6 +92,7 @@ export const useDeleteManyArchiveFileQuery = () => {
 export const useEditArchiveFileQuery = () => {
   const queryClient = useQueryClient()
   const editFileWithoutImg = useMutation({
+    mutationKey: MUTATION_KEYS.ARCHIVE_FILE.editWithoutImg(),
     mutationFn: (fileData: EditFileWithoutImgRequest) =>
       editArchiveFileWithoutImgClient(fileData),
     onSuccess: () => {
@@ -90,6 +100,7 @@ export const useEditArchiveFileQuery = () => {
     }
   })
   const editFileWithImg = useMutation({
+    mutationKey: MUTATION_KEYS.ARCHIVE_FILE.editWithImg(),
     mutationFn: (fileData: EditFileWithImgRequest) =>
       editArchiveFileWithImgClient(fileData),
     onSuccess: () => {
@@ -104,6 +115,7 @@ export const useEditArchiveFileQuery = () => {
 export const useUploadArchiveFileQuery = () => {
   const queryClient = useQueryClient()
   const uploadFile = useMutation({
+    mutationKey: MUTATION_KEYS.ARCHIVE_FILE.upload(),
     mutationFn: ({
       folderId,
       sourceUrl

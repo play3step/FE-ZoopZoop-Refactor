@@ -6,6 +6,7 @@ import { useModalStore } from '@/shared/lib'
 import { useQueryClient } from '@tanstack/react-query'
 import { PATH } from '@/shared/constants'
 import { useDeleteAccountMutation } from './useDeleteAccountMutation'
+import { QUERY_KEYS } from '@/shared/config'
 
 export const useDeleteAccount = () => {
   const router = useRouter()
@@ -19,8 +20,8 @@ export const useDeleteAccount = () => {
   const { isDeleting, mutateDeleteAccount } = useDeleteAccountMutation({
     onSuccess: () => {
       clearUser()
-      queryClient.invalidateQueries({ queryKey: ['user'] })
-      queryClient.removeQueries({ queryKey: ['user'] })
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.USER.me() })
+      queryClient.removeQueries({ queryKey: QUERY_KEYS.USER.me() })
       router.push(PATH.AUTH.LOGIN)
     },
     onError: () => {},

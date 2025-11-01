@@ -4,6 +4,7 @@ import { showErrorToast, showSuccessToast } from '@/shared/ui/toast/Toast'
 import { useQueryClient } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
 import { useRef } from 'react'
+import { QUERY_KEYS } from '@/shared/config'
 
 export const useCreateSpace = () => {
   const queryClient = useQueryClient()
@@ -15,7 +16,7 @@ export const useCreateSpace = () => {
   const { mutateCreateSpace, isCreating } = useCreateSpaceMutation({
     onSuccess: data => {
       // space 목록 캐시 무효화
-      queryClient.invalidateQueries({ queryKey: ['spaces'] })
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.SPACE.all() })
       router.refresh()
       showSuccessToast(`'${data?.name}' 스페이스 생성 완료`)
       closeModal()

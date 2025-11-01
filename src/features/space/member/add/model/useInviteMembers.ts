@@ -1,5 +1,6 @@
-import { memberQueryKeys, useAddMembersMutation } from '@/entities/space'
+import { useAddMembersMutation } from '@/entities/space'
 import { useUserStore } from '@/entities/user'
+import { QUERY_KEYS } from '@/shared/config'
 import { useModalStore } from '@/shared/lib'
 import { showErrorToast, showSuccessToast } from '@/shared/ui/toast/Toast'
 import { useQueryClient } from '@tanstack/react-query'
@@ -23,7 +24,7 @@ export const useInviteMembers = () => {
     },
     onSettled: (_data, _error, { spaceId }) => {
       queryClient.invalidateQueries({
-        queryKey: memberQueryKeys.pending(spaceId)
+        queryKey: QUERY_KEYS.SPACE_MEMBER.pending(spaceId)
       })
     }
   })

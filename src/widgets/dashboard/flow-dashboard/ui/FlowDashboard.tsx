@@ -34,7 +34,8 @@ import { toPng } from 'html-to-image'
 import { updateThumbnailClient } from '@/entities/thumbnail'
 import { useParams } from 'next/navigation'
 import { useQueryClient } from '@tanstack/react-query'
-import { SpaceQueryKey } from '@/entities/space'
+
+import { QUERY_KEYS } from '@/shared/config'
 
 const imageWidth = 1024
 const imageHeight = 768
@@ -276,7 +277,7 @@ const FlowDashboardContent = ({ file }: { file: DashboardFile[] }) => {
       try {
         await updateThumbnailClient(Number(id), file)
         await queryClient.invalidateQueries({
-          queryKey: [SpaceQueryKey]
+          queryKey: QUERY_KEYS.SPACE.all()
         })
       } catch {}
     }

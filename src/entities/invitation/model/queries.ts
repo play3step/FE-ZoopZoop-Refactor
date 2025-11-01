@@ -9,11 +9,12 @@ import {
   cancelInvitationClient
 } from '../api'
 import { InviteResult, Invitation, InviteRequest } from './type'
+import { QUERY_KEYS, MUTATION_KEYS } from '@/shared/config'
 
 // 알림 목록 데이터 패칭
 export const useInvitationQuery = () => {
   return useQuery<Invitation[] | null>({
-    queryKey: ['invitations'],
+    queryKey: QUERY_KEYS.INVITATION.list(),
     queryFn: fetchInvitationsClient
   })
 }
@@ -23,7 +24,7 @@ export const useAcceptInvitationMutation = (
   options: UseMutationOptions<InviteResult | null, Error, InviteRequest>
 ) => {
   const { mutate, isPending, variables } = useMutation({
-    mutationKey: ['invitation', 'accept'],
+    mutationKey: MUTATION_KEYS.INVITATION.accept(),
     mutationFn: payload => acceptInvitationClient(payload),
     ...options
   })
@@ -40,7 +41,7 @@ export const useCancelInvitationMutation = (
   options: UseMutationOptions<InviteResult | null, Error, InviteRequest>
 ) => {
   const { mutate, isPending, variables } = useMutation({
-    mutationKey: ['invitation', 'cancel'],
+    mutationKey: MUTATION_KEYS.INVITATION.cancel(),
     mutationFn: payload => cancelInvitationClient(payload),
     ...options
   })

@@ -1,8 +1,8 @@
 import {
-  memberQueryKeys,
   SpaceAuthorityChangeRequest,
   useUpdateAuthorityMutation
 } from '@/entities/space'
+import { QUERY_KEYS } from '@/shared/config'
 import { showErrorToast, showSuccessToast } from '@/shared/ui/toast/Toast'
 import { useQueryClient } from '@tanstack/react-query'
 
@@ -20,7 +20,7 @@ export const useUpdateAuthority = () => {
       },
       onSettled: (_data, _error, { spaceId }) => {
         queryClient.invalidateQueries({
-          queryKey: memberQueryKeys.list(spaceId)
+          queryKey: QUERY_KEYS.SPACE_MEMBER.list(spaceId)
         })
       }
     })

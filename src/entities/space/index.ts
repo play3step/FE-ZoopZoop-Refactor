@@ -24,7 +24,7 @@ export { useSpaceStore } from './model'
 export type * from './model'
 
 // 상수
-export { SPACE_STATUS, SpaceQueryKey } from './model'
+export { SPACE_STATUS } from './model'
 
 // ui
 export { SpaceCard, SpaceCardSkeleton, SpaceSyncProvider } from './ui'
@@ -42,6 +42,3 @@ export {
 
 // 맴버/타입
 export type * from './member'
-
-// 맴버 상수
-export { memberQueryKeys } from './member'

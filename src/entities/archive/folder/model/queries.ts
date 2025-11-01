@@ -6,11 +6,12 @@ import {
   deleteArchiveFolderClient,
   patchArchiveFolderClient
 } from '../api/folder.client'
+import { QUERY_KEYS, MUTATION_KEYS } from '@/shared/config'
 
 // 폴더 조회
 export const useGetArchiveFoldersQuery = () => {
   const foldersQuery = useQuery({
-    queryKey: ['archiveFolders'],
+    queryKey: QUERY_KEYS.ARCHIVE_FOLDER.all(),
     queryFn: fetchArchiveFolderClient
   })
   return {
@@ -22,9 +23,12 @@ export const useGetArchiveFoldersQuery = () => {
 export const usePostArchiveFolderQuery = () => {
   const queryClient = useQueryClient()
   const addFolder = useMutation({
+    mutationKey: MUTATION_KEYS.ARCHIVE_FOLDER.create(),
     mutationFn: (folderName: string) => postArchiveFolderClient(folderName),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['archiveFolders'] })
+      queryClient.invalidateQueries({
+        queryKey: QUERY_KEYS.ARCHIVE_FOLDER.all()
+      })
     }
   })
 
@@ -38,9 +42,12 @@ export const usePostArchiveFolderQuery = () => {
 export const useDeleteArchiveFolderQuery = () => {
   const queryClient = useQueryClient()
   const deleteFolder = useMutation({
+    mutationKey: MUTATION_KEYS.ARCHIVE_FOLDER.delete(),
     mutationFn: (folderId: number) => deleteArchiveFolderClient(folderId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['archiveFolders'] })
+      queryClient.invalidateQueries({
+        queryKey: QUERY_KEYS.ARCHIVE_FOLDER.all()
+      })
     }
   })
 
@@ -53,6 +60,7 @@ export const useDeleteArchiveFolderQuery = () => {
 export const useEditArchiveFolderNameQuery = () => {
   const queryClient = useQueryClient()
   const updateFolderName = useMutation({
+    mutationKey: MUTATION_KEYS.ARCHIVE_FOLDER.update(),
     mutationFn: ({
       folderId,
       folderName
@@ -61,7 +69,9 @@ export const useEditArchiveFolderNameQuery = () => {
       folderName: string
     }) => patchArchiveFolderClient(folderId, folderName),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['archiveFolders'] })
+      queryClient.invalidateQueries({
+        queryKey: QUERY_KEYS.ARCHIVE_FOLDER.all()
+      })
     }
   })
 

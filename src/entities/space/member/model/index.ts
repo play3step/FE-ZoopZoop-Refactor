@@ -11,4 +11,3 @@ export { useUpdateAuthorityMutation, useAddMembersMutation } from './queries'
 /**
  * 상수
  */
-export { memberQueryKeys } from './constant'

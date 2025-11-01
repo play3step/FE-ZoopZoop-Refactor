@@ -17,7 +17,7 @@ import {
   fetchSpaceMembersClient,
   fetchSpacePendingMembersClient
 } from '../api/member.client'
-import { memberQueryKeys } from './constant'
+import { QUERY_KEYS, MUTATION_KEYS } from '@/shared/config'
 
 // 스페이스 유저 권한 업데이트
 export const useUpdateAuthorityMutation = (
@@ -31,7 +31,7 @@ export const useUpdateAuthorityMutation = (
   >
 ) => {
   const { mutate, isPending, isSuccess, isError } = useMutation({
-    mutationKey: ['update', 'authority'],
+    mutationKey: MUTATION_KEYS.SPACE_MEMBER.updateAuthority(),
     mutationFn: payload => updateMemberAuthorityClient(payload),
     ...options
   })
@@ -52,7 +52,7 @@ export const useAddMembersMutation = (
   >
 ) => {
   const { mutate, isPending } = useMutation({
-    mutationKey: ['add-member'],
+    mutationKey: MUTATION_KEYS.SPACE_MEMBER.add(),
     mutationFn: payload => addSpaceMemberClient(payload),
     ...options
   })
@@ -66,14 +66,14 @@ export const useAddMembersMutation = (
 // 스페이스 유저 정보 list
 export const useMembersQuery = (spaceId: number) => {
   return useSuspenseQuery({
-    queryKey: memberQueryKeys.list(spaceId),
+    queryKey: QUERY_KEYS.SPACE_MEMBER.list(spaceId),
     queryFn: () => fetchSpaceMembersClient(spaceId)
   })
 }
 // 스페이스 유저 정보 list
 export const usePendingMembersQuery = (spaceId: number) => {
   return useSuspenseQuery({
-    queryKey: memberQueryKeys.pending(spaceId),
+    queryKey: QUERY_KEYS.SPACE_MEMBER.pending(spaceId),
     queryFn: () => fetchSpacePendingMembersClient(spaceId)
   })
 }
@@ -86,7 +86,7 @@ export const useExpelMemberMutation = (
   >
 ) => {
   const { mutate, isPending } = useMutation({
-    mutationKey: ['expel-member'],
+    mutationKey: MUTATION_KEYS.SPACE_MEMBER.expel(),
     mutationFn: payload => expelMemberClient(payload),
     ...options
   })

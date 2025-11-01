@@ -13,4 +13,3 @@ export { useUpdateAuthorityMutation, useAddMembersMutation } from './model'
 export type * from './model'
 
 // 상수
-export { memberQueryKeys } from './model'

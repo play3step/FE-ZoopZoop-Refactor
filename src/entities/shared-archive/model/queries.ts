@@ -13,6 +13,7 @@ import {
   fetchSpaceFilesClient
 } from '../api/file.client'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { QUERY_KEYS, MUTATION_KEYS } from '@/shared/config'
 
 interface PageQuery {
   query: SpaceFileByPageRequest
@@ -23,7 +24,13 @@ export const useSpaceFilesQuery = ({ query, initialData }: PageQuery) => {
   const { spaceId, page, sort, keyword, isActive } = query
 
   return useQuery({
-    queryKey: ['spaceFile', spaceId, page, sort, keyword, isActive], //쿼리 키를 다르게 설정
+    queryKey: QUERY_KEYS.SHARED_ARCHIVE.byPage(
+      spaceId ?? 0,
+      page ?? 1,
+      sort ?? '',
+      keyword,
+      isActive
+    ),
     queryFn: () =>
       fetchSpaceFilesClient({
         spaceId,
@@ -42,7 +49,7 @@ export const useSpaceFilesByFolderQuery = (
   options?: { enabled?: boolean }
 ) => {
   return useQuery({
-    queryKey: ['spaceFile', spaceId],
+    queryKey: QUERY_KEYS.SHARED_ARCHIVE.byFolder(spaceId),
     queryFn: () => fetchSpaceFilesByFolderClient({ spaceId }),
     enabled: options?.enabled
   })
@@ -51,10 +58,13 @@ export const useSpaceFilesByFolderQuery = (
 export const useDeleteManySpaceFileQuery = () => {
   const queryClient = useQueryClient()
   const deleteManyFile = useMutation({
+    mutationKey: MUTATION_KEYS.SHARED_ARCHIVE.deleteMany(),
     mutationFn: ({ spaceId, dataSourceId }: TrashSpaceFileRequest) =>
       deleteManySpaceFileClient({ spaceId, dataSourceId }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['spaceFile'] })
+      queryClient.invalidateQueries({
+        queryKey: QUERY_KEYS.SHARED_ARCHIVE.all()
+      })
     }
   })
   return { deleteManyFile }
@@ -64,17 +74,23 @@ export const useDeleteManySpaceFileQuery = () => {
 export const useEditSpaceFileQuery = () => {
   const queryClient = useQueryClient()
   const editFileWithoutImg = useMutation({
+    mutationKey: MUTATION_KEYS.SHARED_ARCHIVE.editWithoutImg(),
     mutationFn: (fileData: EditSpaceFileWithoutImgRequest) =>
       editSpaceFileWithoutImgClient(fileData),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['spaceFile'] })
+      queryClient.invalidateQueries({
+        queryKey: QUERY_KEYS.SHARED_ARCHIVE.all()
+      })
     }
   })
   const editFileWithImg = useMutation({
+    mutationKey: MUTATION_KEYS.SHARED_ARCHIVE.editWithImg(),
     mutationFn: (fileData: EditSpaceFileWithImgRequest) =>
       editSpaceFileWithImgClient(fileData),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['spaceFile'] })
+      queryClient.invalidateQueries({
+        queryKey: QUERY_KEYS.SHARED_ARCHIVE.all()
+      })
     }
   })
 

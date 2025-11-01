@@ -1,5 +1,6 @@
 import { getInitialFolderList } from '@/entities/archive/folder/api/folder.ssr'
 import { getInitialNews } from '@/entities/news'
+import { QUERY_KEYS } from '@/shared/config'
 import { RecommendedNewsList } from '@/widgets/news/news-recommend/ui/NewsRecommend'
 import {
   dehydrate,
@@ -59,7 +60,7 @@ export default async function Recommend({
   const selectedFolderId = folderId || defaultFolder?.folderId?.toString() || ''
 
   await queryClient.prefetchQuery({
-    queryKey: ['recommended-news', selectedFolderId],
+    queryKey: QUERY_KEYS.NEWS.recommended(selectedFolderId),
     queryFn: () => getInitialNews({ folderId: selectedFolderId })
   })
 

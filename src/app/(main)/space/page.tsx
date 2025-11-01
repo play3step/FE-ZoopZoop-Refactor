@@ -1,6 +1,7 @@
-import { SpaceQueryKey, SpaceStatus } from '@/entities/space'
+import { SpaceStatus } from '@/entities/space'
 import { getInitialSpaceList } from '@/entities/space/api/space.ssr'
 import { SpaceList } from '@/features/space/list'
+import { QUERY_KEYS } from '@/shared/config'
 import SpaceTab from '@/widgets/space/space-tab/ui/SpaceTab'
 import {
   dehydrate,
@@ -20,7 +21,7 @@ export default async function Space({ searchParams }: Props) {
   const currentState = (params?.state as SpaceStatus) ?? undefined
 
   await queryClient.prefetchQuery({
-    queryKey: [SpaceQueryKey, currentPage, currentState],
+    queryKey: QUERY_KEYS.SPACE.pagination(currentPage, currentState),
     queryFn: () =>
       getInitialSpaceList({
         page: currentPage,
