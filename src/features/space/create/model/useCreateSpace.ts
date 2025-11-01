@@ -3,8 +3,8 @@ import { useModalStore } from '@/shared/lib'
 import { showErrorToast, showSuccessToast } from '@/shared/ui/toast/Toast'
 import { useQueryClient } from '@tanstack/react-query'
 import { useRef } from 'react'
-import { CACHE_TAGS, QUERY_KEYS } from '@/shared/config'
-import { revalidateTag } from 'next/cache'
+import { QUERY_KEYS } from '@/shared/config'
+import { revalidateSpaceList } from './space'
 
 export const useCreateSpace = () => {
   const queryClient = useQueryClient()
@@ -14,10 +14,11 @@ export const useCreateSpace = () => {
 
   // tanstack query
   const { mutateCreateSpace, isCreating } = useCreateSpaceMutation({
-    onSuccess: data => {
+    onSuccess: async data => {
       // space 목록 캐시 무효화
-      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.SPACE.all() })
-      revalidateTag(CACHE_TAGS.SPACE.list()[0])
+      await queryClient.invalidateQueries({ queryKey: QUERY_KEYS.SPACE.all() })
+      await revalidateSpaceList()
+
       showSuccessToast(`'${data?.name}' 스페이스 생성 완료`)
       closeModal()
     },
