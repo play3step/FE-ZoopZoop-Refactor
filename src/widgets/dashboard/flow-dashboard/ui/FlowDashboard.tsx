@@ -69,7 +69,9 @@ const FlowDashboardContent = ({ file }: { file: DashboardFile[] }) => {
   } = useFlowState()
 
   const { onDrop, onDragOver } = useFlowDragDrop({ setNodes, nodes })
-  const { others, handlePointerMove, handlePointerLeave } = useCursor()
+
+  const { others, handlePointerMove, handlePointerLeave, updateDraggingNode } =
+    useCursor()
   const { flowToScreenPosition, screenToFlowPosition } = useReactFlow()
 
   const { id } = useParams()
@@ -90,6 +92,11 @@ const FlowDashboardContent = ({ file }: { file: DashboardFile[] }) => {
   // 사용자별 로컬 선택 상태
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
 
+  const [myDraggingPosition, setMyDraggingPosition] = useState<{
+    nodeId: string
+    position: { x: number; y: number }
+  } | null>(null)
+
   const handleNodesChange: OnNodesChange = changes => {
     // select 변화는 로컬 선택 상태에만 반영
     const select = changes.filter(c => c.type === 'select')
@@ -106,15 +113,69 @@ const FlowDashboardContent = ({ file }: { file: DashboardFile[] }) => {
       })
     }
 
-    // 그 외 변화(이동/크기변경 등)만 공유 스토리지에 반영
-    const other = changes.filter(c => c.type !== 'select')
-    if (other.length) onNodesChange(other)
+    // position 변화 처리
+    const positionChanges = changes.filter(c => c.type === 'position')
+
+    positionChanges.forEach(change => {
+      if (change.type === 'position') {
+        if (change.dragging && change.position) {
+          // 드래그 중: Presence로 실시간 공유 + 로컬 state 업데이트
+          updateDraggingNode(change.id, change.position)
+          setMyDraggingPosition({
+            nodeId: change.id,
+            position: change.position
+          })
+        } else if (!change.dragging) {
+          // 드래그 끝: Presence 초기화 + 로컬 state 초기화
+          updateDraggingNode(null)
+          setMyDraggingPosition(null)
+        }
+      }
+    })
+
+    // 드래그가 끝났을 때만 Storage에 반영
+    const finishedDragChanges = changes.filter(
+      c => c.type === 'position' && !c.dragging
+    )
+
+    const otherChanges = changes.filter(
+      c => c.type !== 'select' && c.type !== 'position'
+    )
+
+    const changesToApply = [...finishedDragChanges, ...otherChanges]
+    if (changesToApply.length > 0) {
+      onNodesChange(changesToApply)
+    }
   }
 
-  const nodesWithSelection = useMemo(
-    () => nodes.map(n => ({ ...n, selected: selectedIds.has(n.id) })),
-    [nodes, selectedIds]
-  )
+  const nodesWithOthersDragging = useMemo(() => {
+    // 드래그 중인 노드 위치 수집 (내 것 + 다른 사람 것)
+    const draggingMap = new Map<string, { x: number; y: number }>()
+
+    // 1. 내 드래그 위치 추가 (최우선)
+    if (myDraggingPosition) {
+      draggingMap.set(myDraggingPosition.nodeId, myDraggingPosition.position)
+    }
+
+    // 2. 다른 사람들의 드래그 위치 추가
+    others.forEach(other => {
+      if (other.presence?.draggingNode) {
+        const { nodeId, position } = other.presence.draggingNode
+        // 내가 드래그 중인 노드가 아닌 경우만 추가
+        if (!myDraggingPosition || myDraggingPosition.nodeId !== nodeId) {
+          draggingMap.set(nodeId, position)
+        }
+      }
+    })
+
+    return nodes.map(n => ({
+      ...n,
+      // 드래그 중인 위치가 있으면 그 위치, 아니면 Storage의 원래 위치
+      position: draggingMap.get(n.id) || n.position,
+      // 내 로컬 선택 상태만 반영
+      selected: selectedIds.has(n.id)
+    }))
+  }, [nodes, selectedIds, others, myDraggingPosition])
 
   const handlePaneClick = (event: React.MouseEvent) => {
     if (isCreating) {
@@ -275,7 +336,7 @@ const FlowDashboardContent = ({ file }: { file: DashboardFile[] }) => {
             )
           })}
         <ReactFlow
-          nodes={nodesWithSelection}
+          nodes={nodesWithOthersDragging}
           edges={edges}
           nodeTypes={nodeTypes}
           defaultEdgeOptions={defaultEdgeOptions}

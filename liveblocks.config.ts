@@ -2,6 +2,10 @@ declare global {
   interface Liveblocks {
     Presence: {
       cursor: { x: number; y: number } | null
+      draggingNode: {
+        nodeId: string
+        position: { x: number; y: number }
+      } | null
     }
 
     Storage: {

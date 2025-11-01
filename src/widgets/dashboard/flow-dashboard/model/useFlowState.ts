@@ -42,7 +42,13 @@ export const useFlowState = () => {
     changes => {
       if (!nodes) return
       const newNodes = applyNodeChanges(changes, nodes)
-      updateNodes(newNodes)
+
+      const nodesToStore = newNodes.map(node => {
+        const { selected, ...rest } = node
+        return rest
+      })
+
+      updateNodes(nodesToStore)
     },
     [nodes, updateNodes]
   )
@@ -90,7 +96,12 @@ export const useFlowState = () => {
         return [...remainingEdges, ...createdEdges]
       }, edges)
 
-      updateNodes(remainingNodes)
+      const nodesToStore = remainingNodes.map(node => {
+        const { selected, ...rest } = node
+        return rest
+      })
+
+      updateNodes(nodesToStore)
       updateEdges(newEdges)
     },
     [nodes, edges, updateNodes, updateEdges]
@@ -101,7 +112,13 @@ export const useFlowState = () => {
       if (!nodes) return
       const updatedNodes =
         typeof newNodes === 'function' ? newNodes(nodes) : newNodes
-      updateNodes(updatedNodes)
+
+      const nodesToStore = updatedNodes.map(node => {
+        const { selected, ...rest } = node
+        return rest
+      })
+
+      updateNodes(nodesToStore)
     },
     [nodes, updateNodes]
   )

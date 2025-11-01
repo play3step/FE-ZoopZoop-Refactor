@@ -50,7 +50,7 @@ export function Room({
       }}>
       <RoomProvider
         id={roomId}
-        initialPresence={{ cursor: null }}
+        initialPresence={{ cursor: null, draggingNode: null }}
         initialStorage={{
           nodes: initialNodes,
           edges: initialEdges
