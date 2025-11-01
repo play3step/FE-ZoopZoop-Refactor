@@ -1,6 +1,7 @@
 import { requireAuth } from '@/shared/lib/api-route'
 import { fetchSpaceListServer, fetchSpaceServer } from './space.server'
 import { FetchSpaceListParams, Space, SpacePagination } from '../model/type'
+import { CACHE_TAGS } from '@/shared/config'
 
 // 서버 컴포넌트  API 호출 함수
 
@@ -13,7 +14,7 @@ export const getInitialSpaceList = async (
   const response = await requireAuth(async token => {
     return fetchSpaceListServer(params, {
       token,
-      next: { tags: ['spaces'] }
+      next: { tags: CACHE_TAGS.SPACE.list() }
     })
   })
 

@@ -1,6 +1,7 @@
 import { requireAuth } from '@/shared/lib/api-route'
 import { fetchArchiveFilesByPageServer } from './file.server'
 import { SearchGetResponse, FileSearchParams } from '../model/type'
+import { CACHE_TAGS } from '@/shared/config'
 
 // 페이지 내 파일 조회
 export const getInitialFileList = async (
@@ -10,7 +11,7 @@ export const getInitialFileList = async (
     return fetchArchiveFilesByPageServer(params, {
       token,
       cache: 'no-store',
-      next: { tags: ['archiveFiles'] }
+      next: { tags: CACHE_TAGS.ARCHIVE.file() }
     })
   })
 

@@ -5,6 +5,7 @@ import {
 } from '../model/type'
 
 import { fetchSpaceFilesByPageServer } from './file.server'
+import { CACHE_TAGS } from '@/shared/config'
 
 // 페이지 내 파일 조회
 export const getInitialSpaceFileList = async (
@@ -14,7 +15,7 @@ export const getInitialSpaceFileList = async (
     return fetchSpaceFilesByPageServer(params, {
       token,
       //  next: { revalidate: 10, tags: ['spaceFiles'] }
-      next: { tags: ['spaceFiles'] }
+      next: { tags: CACHE_TAGS.SPACE.file() }
     })
   })
 

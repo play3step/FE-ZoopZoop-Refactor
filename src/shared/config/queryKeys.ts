@@ -96,4 +96,16 @@ export const MUTATION_KEYS = {
   }
 }
 
-export const CACHE_TAGS = {}
+export const CACHE_TAGS = {
+  NEWS: {
+    recommended: (folderId: string) => [`news-${folderId}`]
+  },
+  SPACE: {
+    file: () => [`space-file`],
+    list: () => [`spaces`]
+  },
+  ARCHIVE: {
+    folder: () => ['archive-folder'],
+    file: () => ['archive-file']
+  }
+}
