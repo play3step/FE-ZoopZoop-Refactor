@@ -2,10 +2,11 @@ import { useEditSpaceFileQuery } from '@/entities/shared-archive/model/queries'
 import { useModalStore } from '@/shared/lib'
 import { BadgeCategory } from '@/shared/ui/badge/Badge'
 import { showSuccessToast } from '@/shared/ui/toast/Toast'
+import { useRouter } from 'next/navigation'
 
 export const useEditSpaceFileAction = () => {
   const closeModal = useModalStore(s => s.closeModal)
-
+  const router = useRouter()
   const { editFileWithoutImg, editFileWithImg } = useEditSpaceFileQuery()
   const handleEdit = ({
     newTags,
@@ -78,6 +79,7 @@ export const useEditSpaceFileAction = () => {
           onSuccess: () => {
             showSuccessToast('수정 완료')
             closeModal()
+            router.refresh()
           }
         }
       )
