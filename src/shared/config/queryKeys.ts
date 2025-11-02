@@ -24,6 +24,7 @@ export const QUERY_KEYS = {
     all: () => ['archiveFolders']
   },
   ARCHIVE_FILE: {
+    all: () => ['archiveFilesPage'],
     byFolder: (folderId: number) => ['archiveFilesPage', folderId],
     byPage: (
       folderId: number,

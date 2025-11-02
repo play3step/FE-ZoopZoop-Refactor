@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { postCopyFileToSpaceClient } from '../api/copyToSpace.client'
 import { fetchSpaceListClient } from '@/entities/space'
 import { MUTATION_KEYS, QUERY_KEYS } from '@/shared/config'
+import { revalidateSpaceFiles } from '@/entities/shared-archive'
 
 //스페이스로 복사
 export const useCopyToSpaceArchiveFilesQuery = () => {
@@ -13,10 +14,11 @@ export const useCopyToSpaceArchiveFilesQuery = () => {
       dataSourceId: number[]
       targetFolderId: number
     }) => postCopyFileToSpaceClient(payload),
-    onSuccess: () => {
+    onSuccess: async () => {
       queryClient.invalidateQueries({
         queryKey: QUERY_KEYS.SHARED_ARCHIVE.files()
       })
+      await revalidateSpaceFiles()
     }
   })
 

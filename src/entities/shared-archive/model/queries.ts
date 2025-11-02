@@ -14,6 +14,7 @@ import {
 } from '../api/file.client'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { QUERY_KEYS, MUTATION_KEYS } from '@/shared/config'
+import { revalidateSpaceFiles } from './sharedArchive'
 
 interface PageQuery {
   query: SpaceFileByPageRequest
@@ -61,10 +62,11 @@ export const useDeleteManySpaceFileQuery = () => {
     mutationKey: MUTATION_KEYS.SHARED_ARCHIVE.deleteMany(),
     mutationFn: ({ spaceId, dataSourceId }: TrashSpaceFileRequest) =>
       deleteManySpaceFileClient({ spaceId, dataSourceId }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
         queryKey: QUERY_KEYS.SHARED_ARCHIVE.all()
       })
+      await revalidateSpaceFiles()
     }
   })
   return { deleteManyFile }
@@ -77,17 +79,19 @@ export const useEditSpaceFileQuery = () => {
     mutationKey: MUTATION_KEYS.SHARED_ARCHIVE.editWithoutImg(),
     mutationFn: (fileData: EditSpaceFileWithoutImgRequest) =>
       editSpaceFileWithoutImgClient(fileData),
-    onSuccess: () => {
-      queryClient.invalidateQueries({
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
         queryKey: QUERY_KEYS.SHARED_ARCHIVE.all()
       })
+      await revalidateSpaceFiles()
     }
   })
+
   const editFileWithImg = useMutation({
     mutationKey: MUTATION_KEYS.SHARED_ARCHIVE.editWithImg(),
     mutationFn: (fileData: EditSpaceFileWithImgRequest) =>
       editSpaceFileWithImgClient(fileData),
-    onSuccess: () => {
+    onSuccess: async () => {
       queryClient.invalidateQueries({
         queryKey: QUERY_KEYS.SHARED_ARCHIVE.all()
       })

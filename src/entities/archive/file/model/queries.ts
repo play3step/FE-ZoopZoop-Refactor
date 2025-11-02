@@ -15,6 +15,7 @@ import {
   postArchiveFileClient
 } from '../api/file.client'
 import { QUERY_KEYS, MUTATION_KEYS } from '@/shared/config'
+import { revalidateArchiveFiles } from './archive'
 
 export const useArchiveFilesByFolderQuery = (
   folderId: number,
@@ -68,8 +69,11 @@ export const useDeleteOneArchiveFileQuery = () => {
     mutationKey: MUTATION_KEYS.ARCHIVE_FILE.deleteOne(),
     mutationFn: (dataSourceId: number) =>
       deleteOneArchiveFileClient(dataSourceId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['archiveFilesPage'] })
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: QUERY_KEYS.ARCHIVE_FILE.all()
+      })
+      await revalidateArchiveFiles()
     }
   })
   return { deleteOneFile }
@@ -81,8 +85,11 @@ export const useDeleteManyArchiveFileQuery = () => {
     mutationKey: MUTATION_KEYS.ARCHIVE_FILE.deleteMany(),
     mutationFn: (dataSourceId: number[]) =>
       deleteManyArchiveFileClient(dataSourceId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['archiveFilesPage'] })
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: QUERY_KEYS.ARCHIVE_FILE.all()
+      })
+      await revalidateArchiveFiles()
     }
   })
   return { deleteManyFile }
@@ -95,16 +102,22 @@ export const useEditArchiveFileQuery = () => {
     mutationKey: MUTATION_KEYS.ARCHIVE_FILE.editWithoutImg(),
     mutationFn: (fileData: EditFileWithoutImgRequest) =>
       editArchiveFileWithoutImgClient(fileData),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['archiveFilesPage'] })
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: QUERY_KEYS.ARCHIVE_FILE.all()
+      })
+      await revalidateArchiveFiles()
     }
   })
   const editFileWithImg = useMutation({
     mutationKey: MUTATION_KEYS.ARCHIVE_FILE.editWithImg(),
     mutationFn: (fileData: EditFileWithImgRequest) =>
       editArchiveFileWithImgClient(fileData),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['archiveFilesPage'] })
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: QUERY_KEYS.ARCHIVE_FILE.all()
+      })
+      await revalidateArchiveFiles()
     }
   })
 
@@ -123,8 +136,11 @@ export const useUploadArchiveFileQuery = () => {
       folderId: number
       sourceUrl: string
     }) => postArchiveFileClient(folderId, sourceUrl),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['archiveFilesPage'] })
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: QUERY_KEYS.ARCHIVE_FILE.all()
+      })
+      await revalidateArchiveFiles()
     }
   })
   return { uploadFile }
